@@ -1,0 +1,2205 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Life OS PRO | Your Complete Life Manager</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Theme Variables */
+        :root {
+            --bg-gradient: radial-gradient(circle at 20% 30%, #0a0c15, #03050b);
+            --card-bg: rgba(12, 16, 28, 0.85);
+            --card-border: rgba(0, 246, 255, 0.3);
+            --text-primary: #f0f3ff;
+            --text-secondary: #aab3cf;
+            --input-bg: rgba(20, 26, 44, 0.8);
+            --input-border: #2a3455;
+            --button-gradient: linear-gradient(95deg, #00c3ff, #a855f7);
+            --accent: #00f6ff;
+            --accent-glow: rgba(0, 246, 255, 0.2);
+        }
+
+        body.light {
+            --bg-gradient: #f5f7fc;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --text-primary: #1a1f2e;
+            --text-secondary: #4a5568;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --button-gradient: linear-gradient(95deg, #2563eb, #7c3aed);
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 85px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #141a2c; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        #topBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 2000;
+        }
+        #topFill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            border-radius: 28px;
+            padding: 1.5rem;
+            margin: 16px 14px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        h2, h3 {
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        h3 {
+            font-size: 1.3rem;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 14px;
+            margin: 8px 0;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        button {
+            background: var(--button-gradient);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            box-shadow: none;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 12px 20px;
+            border-top: 1px solid var(--card-border);
+            z-index: 1000;
+            gap: 4px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav button {
+            background: transparent;
+            box-shadow: none;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        .nav button.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .section {
+            display: none;
+            animation: fadeSlide 0.3s ease-out;
+            padding-top: 12px;
+        }
+        .active-section {
+            display: block;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge {
+            background: var(--accent-glow);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        .list-item, .task-item, .memory-card, .exercise-card {
+            background: var(--input-bg);
+            border-radius: 20px;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--input-border);
+        }
+        .memory-card img {
+            max-width: 100%;
+            border-radius: 16px;
+            margin-top: 8px;
+        }
+        .game-card {
+            background: var(--input-bg);
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid var(--input-border);
+        }
+        .game-card.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .quote-text {
+            font-style: italic;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 28px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .timer-display {
+            font-family: monospace;
+            font-size: 2rem;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        .clock {
+            font-size: 2rem;
+            text-align: center;
+            font-family: monospace;
+            font-weight: 600;
+        }
+        .life-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .life-tab-btn {
+            background: var(--input-bg);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid var(--input-border);
+        }
+        .life-tab-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .life-pane {
+            display: none;
+        }
+        .life-pane.active-pane {
+            display: block;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+        .cal-day {
+            background: var(--input-bg);
+            border-radius: 18px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--input-border);
+        }
+        .cal-day.selected {
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+        }
+        .badge-dot {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 5px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 10px;
+            background: var(--accent);
+        }
+        .alert-banner {
+            background: rgba(255, 51, 102, 0.2);
+            border-left: 4px solid #ff3366;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin: 8px 14px;
+            color: var(--text-primary);
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            background: var(--input-bg);
+            padding: 8px;
+            border-radius: 20px;
+        }
+        .todo-item input[type="checkbox"] {
+            width: 20px;
+            margin: 0;
+        }
+        .todo-item span {
+            flex: 1;
+        }
+        .score-big {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .rich-toolbar {
+            display: flex;
+            gap: 10px;
+            margin: 8px 0;
+        }
+        .rich-btn {
+            background: var(--input-bg);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid var(--input-border);
+        }
+        #richNoteArea {
+            background: var(--input-bg);
+            min-height: 110px;
+            border-radius: 20px;
+            padding: 12px;
+            border: 1px solid var(--input-border);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body id="appBody">
+<div id="topBar"><div id="topFill"></div></div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active-section">
+    <div id="inAppAlerts"></div>
+    <div class="card">
+        <div class="flex-between">
+            <h2>Daily Score</h2>
+            <span id="scoreValue" class="score-big">0</span>
+        </div>
+        <div class="flex-between">
+            <span>🔥 Streak: <span id="streakCount">0</span> days</span>
+            <span>🏆 Points: <span id="userPoints">0</span></span>
+        </div>
+        <div id="badgesList" class="flex-between" style="flex-wrap: wrap; margin-top: 8px;"></div>
+    </div>
+    <div class="card">
+        <div class="flex-between">
+            <h3>Daily Mood</h3>
+            <select id="quickMood" style="width: auto; flex: 1;">
+                <option>😊 Happy</option>
+                <option>😐 Neutral</option>
+                <option>😔 Sad</option>
+                <option>😠 Angry</option>
+                <option>😴 Tired</option>
+            </select>
+            <button id="applyMoodBtn" style="padding: 8px 16px;">Get Advice</button>
+        </div>
+        <div id="moodAdvice" style="margin-top: 12px; padding: 12px; background: var(--input-bg); border-radius: 20px;"></div>
+    </div>
+    <div class="card">
+        <h3>Performance Trend (14 days)</h3>
+        <canvas id="mainChart" style="max-height: 220px;"></canvas>
+    </div>
+    <div class="card">
+        <h3>Life Quote</h3>
+        <div class="quote-text">
+            “We fight wars no one sees, drown in expectations we never chose, replay conversations that ended years ago, carry wounds we call lessons, chase approval like oxygen, and stand in storms created by our own thoughts, overanalyzing every silence, fearing every ‘what if,’ exhausting ourselves trying to control what was never ours to hold. We try to understand everything, fix everything, answer everything, until we realize that not every battle deserves our energy, not every voice deserves our attention, and not every problem deserves a reaction. Some storms survive only because we keep feeding them. And sometimes, the moment we stop giving them power, they fade. That is when we understand that ignorance is the key to solving many of life’s problems… so just ignore.” <br>— Adam Abou El Hosn
+        </div>
+    </div>
+</div>
+
+<!-- TRACKER -->
+<div id="tracker" class="section">
+    <div class="card">
+        <div class="flex-between">
+            <h3>Workout</h3>
+            <input type="checkbox" id="workoutDone" style="width: auto;">
+        </div>
+        <input type="text" id="workoutType" placeholder="Type (Running, Yoga...)" autocomplete="off">
+        <div class="grid-2col">
+            <input type="text" id="workoutDuration" placeholder="Duration (min)">
+            <select id="workoutIntensity">
+                <option>Low</option>
+                <option selected>Medium</option>
+                <option>High</option>
+            </select>
+        </div>
+        <h3>Meals</h3>
+        <div class="grid-2col">
+            <input type="number" id="mealCount" min="0" max="3" placeholder="Meals (0-3)">
+            <input type="number" id="mealCalories" placeholder="Calories (opt)">
+        </div>
+        <div class="flex-between">
+            <label>Study</label>
+            <input type="checkbox" id="studyDone">
+        </div>
+        <div class="flex-between">
+            <label>Writing</label>
+            <input type="checkbox" id="writeDone">
+        </div>
+        <label>Weight (kg)</label>
+        <input type="number" id="weightEntry" step="0.1">
+        <h3>Wellness</h3>
+        <div class="grid-2col">
+            <div><label>Mood (1-5)</label><input type="number" id="moodInput" min="1" max="5" step="1"></div>
+            <div><label>Sleep (hours)</label><input type="number" id="sleepInput" step="0.5" placeholder="7"></div>
+            <div><label>Water (glasses)</label><input type="number" id="waterInput" placeholder="4"></div>
+            <div><label>Stress (1-5)</label><input type="number" id="stressInput" min="1" max="5"></div>
+        </div>
+        <div class="flex-between">
+            <label>Feeling sick?</label>
+            <input type="checkbox" id="sickCheckbox">
+        </div>
+        <label>Day Rating (1-10)</label>
+        <input type="number" id="dayRating" min="1" max="10">
+        <h3>Hobbies</h3>
+        <div id="hobbiesList"></div>
+        <div class="flex-between">
+            <input type="text" id="newHobbyName" placeholder="Hobby name">
+            <input type="text" id="newHobbyDuration" placeholder="Duration (min)">
+        </div>
+        <div class="flex-between">
+            <label><input type="checkbox" id="isRestDayCheckbox"> Rest day</label>
+            <button id="addHobbyBtn">Add Hobby</button>
+        </div>
+        <h3>Music I Love</h3>
+        <div id="musicList"></div>
+        <div class="flex-between">
+            <input type="text" id="newSongTitle" placeholder="Song title">
+            <input type="text" id="newSongArtist" placeholder="Artist">
+        </div>
+        <button id="addSongBtn">Add Song</button>
+        <button id="saveTrackerBtn" style="margin-top: 18px; width: 100%;">Save Today's Data</button>
+        <p id="trackerFeedback" style="font-size: 12px; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="calendar" class="section">
+    <div class="card">
+        <div class="flex-between">
+            <h3>Habit Calendar</h3>
+            <div>
+                <button id="prevMonthBtn">◀</button>
+                <span id="monthYearDisplay" style="margin: 0 12px;"></span>
+                <button id="nextMonthBtn">▶</button>
+            </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+        <p style="font-size: 12px; text-align: center; margin-top: 8px;">Tap a day to view/edit its data</p>
+        <hr>
+        <h3>Events & Birthdays</h3>
+        <div id="upcomingEventsList"></div>
+        <div class="flex-between">
+            <button id="addEventBtn">+ Add Event</button>
+            <button id="addBirthdayBtn">+ Add Birthday</button>
+        </div>
+        <div id="eventForm" style="display: none; margin-top: 12px;">
+            <input type="text" id="eventName" placeholder="Event name">
+            <input type="datetime-local" id="eventDateTime">
+            <label><input type="checkbox" id="eventAlarm"> Enable alarm</label>
+            <button id="saveEventBtn">Save</button>
+            <button id="cancelEventBtn">Cancel</button>
+        </div>
+        <div id="birthdayForm" style="display: none; margin-top: 12px;">
+            <input type="text" id="birthdayName" placeholder="Person's name">
+            <input type="date" id="birthdayDate">
+            <label><input type="checkbox" id="birthdayNotify"> Notify before</label>
+            <button id="saveBirthdayBtn">Save</button>
+            <button id="cancelBirthdayBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- NOTES + TODO -->
+<div id="notes" class="section">
+    <div class="card">
+        <div class="flex-between">
+            <h3>Notes</h3>
+            <button id="newNoteBtn">+ New Note</button>
+        </div>
+        <div id="notesListContainer" style="max-height: 300px; overflow-y: auto;"></div>
+        <div id="noteEditorPanel" style="display: none; margin-top: 16px;">
+            <input type="text" id="noteTitle" placeholder="Title">
+            <div class="rich-toolbar">
+                <button type="button" class="rich-cmd" data-cmd="bold">Bold</button>
+                <button type="button" class="rich-cmd" data-cmd="italic">Italic</button>
+                <button type="button" class="rich-cmd" data-cmd="insertUnorderedList">Bullet list</button>
+            </div>
+            <div id="noteContent" contenteditable="true" style="min-height: 150px;"></div>
+            <div class="flex-between" style="margin-top: 12px;">
+                <button id="saveNoteBtn">Save</button>
+                <button id="cancelNoteBtn">Cancel</button>
+            </div>
+        </div>
+        <hr>
+        <h3>To-Do List</h3>
+        <div id="todoListContainer"></div>
+        <div class="flex-between">
+            <input type="text" id="newTodoText" placeholder="New task">
+            <button id="addTodoBtn">Add Task</button>
+        </div>
+    </div>
+</div>
+
+<!-- WORKOUT PLAN -->
+<div id="workout" class="section">
+    <div class="card">
+        <h3>My Workout Plan</h3>
+        <div id="workoutLibrary"></div>
+        <div class="flex-between" style="margin-top: 16px;">
+            <input type="text" id="customExName" placeholder="Exercise">
+            <input type="text" id="customExSets" placeholder="Sets">
+            <input type="text" id="customExReps" placeholder="Reps">
+        </div>
+        <button id="addCustomExBtn">Add to Plan</button>
+        <div id="timerArea" style="margin-top: 20px; text-align: center; display: none;">
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <button id="stopTimerBtn">Stop</button>
+        </div>
+    </div>
+</div>
+
+<!-- RELATIONSHIP -->
+<div id="relationship" class="section">
+    <div class="card">
+        <h3>Primary Countdown</h3>
+        <div class="flex-between">
+            <input type="datetime-local" id="primaryRelDate">
+            <button id="setPrimaryBtn">Set</button>
+        </div>
+        <div id="primaryCountdown" style="font-size: 1.4rem; font-weight: bold; text-align: center; margin: 12px 0;"></div>
+        <hr>
+        <h3>Together Since</h3>
+        <div class="flex-between">
+            <input type="datetime-local" id="togetherSinceDate">
+            <button id="setTogetherBtn">Set</button>
+        </div>
+        <div id="togetherCounter" style="text-align: center; margin: 12px 0;"></div>
+        <div style="text-align: center;">
+            <button id="toggleTogetherUnitBtn">Toggle View</button>
+        </div>
+        <hr>
+        <h3>Love Messages</h3>
+        <div id="loveMessagesList"></div>
+        <div class="flex-between">
+            <textarea id="newLoveMsg" rows="2" placeholder="Write a sweet message..."></textarea>
+            <button id="addLoveMsgBtn">Add</button>
+        </div>
+        <button id="monthlyLoveSummaryBtn">Monthly Love Summary</button>
+        <div id="loveSummary" style="margin-top: 12px; background: var(--input-bg); border-radius: 20px; padding: 12px;"></div>
+        <hr>
+        <div class="flex-between">
+            <h3>Special Dates</h3>
+            <button id="addSpecialDateBtn">+ Add</button>
+        </div>
+        <div id="specialDatesList"></div>
+        <div id="newSpecialForm" style="display: none; margin-top: 12px;">
+            <input type="text" id="specialName" placeholder="Event name">
+            <input type="datetime-local" id="specialDateTime">
+            <button id="confirmSpecialBtn">Add</button>
+            <button id="cancelSpecialBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- BAD HABIT TRACKER -->
+<div id="badhabits" class="section">
+    <div class="card">
+        <h3>Bad Habit Tracker</h3>
+        <div id="badHabitsList"></div>
+        <div class="flex-between">
+            <input type="text" id="newBadHabitName" placeholder="Habit name">
+            <button id="addBadHabitBtn">Add Habit</button>
+        </div>
+        <p style="margin-top: 12px;">Check to log today. Intensity optional.</p>
+    </div>
+</div>
+
+<!-- PRODUCTIVITY -->
+<div id="productivity" class="section">
+    <div class="card">
+        <div class="flex-between">
+            <h3>Tasks & Projects</h3>
+            <button id="addTaskBtnProd">+ Task</button>
+        </div>
+        <div id="tasksListProd"></div>
+        <div id="newTaskFormProd" style="display: none;">
+            <input type="text" id="taskNameProd" placeholder="Task name">
+            <input type="text" id="taskSubProd" placeholder="Sub-tasks">
+            <input type="date" id="taskDeadlineProd">
+            <select id="taskPriorityProd">
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+            </select>
+            <button id="saveTaskBtnProd">Save</button>
+            <button id="cancelTaskBtnProd">Cancel</button>
+        </div>
+        <hr>
+        <h3>Skill Challenges</h3>
+        <div id="skillChallengesList"></div>
+        <div class="flex-between">
+            <input type="text" id="newChallenge" placeholder="New challenge">
+            <button id="addChallengeBtn">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- HEALTH & FITNESS -->
+<div id="health" class="section">
+    <div class="card">
+        <h3>Workout Planner</h3>
+        <div id="workoutPlansList"></div>
+        <div class="flex-between">
+            <input type="text" id="newWorkoutPlan" placeholder="Plan name">
+            <input type="text" id="newWorkoutDetails" placeholder="Details">
+            <button id="addWorkoutPlanBtn">Add</button>
+        </div>
+        <hr>
+        <h3>Nutrition Tracker</h3>
+        <div class="grid-2col">
+            <input type="number" id="caloriesInput" placeholder="Calories">
+            <input type="number" id="proteinInput" placeholder="Protein (g)">
+        </div>
+        <button id="saveNutritionBtn">Save</button>
+        <div id="nutritionHistory"></div>
+        <hr>
+        <h3>Mind & Body</h3>
+        <button id="startMeditationBtn">5-min Meditation</button>
+        <div id="meditationTimer" style="display: none; text-align: center; margin-top: 10px;">00:00</div>
+        <button id="breathingExerciseBtn">Breathing Exercise</button>
+    </div>
+</div>
+
+<!-- ENTERTAINMENT -->
+<div id="entertainment" class="section">
+    <div class="card">
+        <h3>Mood-Based Music</h3>
+        <select id="moodSelect">
+            <option>Happy</option>
+            <option>Chill</option>
+            <option>Energetic</option>
+            <option>Sad</option>
+        </select>
+        <button id="recommendMusicBtn">Recommend</button>
+        <div id="musicRecommendations"></div>
+        <hr>
+        <h3>Memory Match</h3>
+        <div id="memoryGameGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px;"></div>
+        <p id="gameScore">Moves: 0</p>
+        <button id="resetGameBtn">New Game</button>
+    </div>
+</div>
+
+<!-- MEMORY SECTION -->
+<div id="memory" class="section">
+    <div class="card">
+        <h3>Memories</h3>
+        <div id="memoriesList"></div>
+        <div class="flex-between">
+            <input type="text" id="memoryTitle" placeholder="Title">
+            <input type="file" id="memoryImage" accept="image/*">
+            <button id="addMemoryBtn">Add Memory</button>
+        </div>
+    </div>
+</div>
+
+<!-- LIFE TOOLS -->
+<div id="life" class="section">
+    <div class="card">
+        <div class="life-tabs">
+            <button class="life-tab-btn active" data-pane="money">Money</button>
+            <button class="life-tab-btn" data-pane="shopping">Shopping</button>
+            <button class="life-tab-btn" data-pane="goals">Goals</button>
+            <button class="life-tab-btn" data-pane="wellness">Wellness</button>
+            <button class="life-tab-btn" data-pane="tools">Tools</button>
+        </div>
+        <!-- Money -->
+        <div id="moneyPane" class="life-pane active-pane">
+            <div class="flex-between">
+                <h4>Balance: $<span id="balance">0</span></h4>
+                <button id="addTransactionBtn">+ Add</button>
+            </div>
+            <div id="transactionsList"></div>
+            <div id="transactionForm" style="display: none;">
+                <input type="text" id="transDesc" placeholder="Description">
+                <input type="number" id="transAmount" placeholder="Amount">
+                <select id="transType">
+                    <option>expense</option>
+                    <option>income</option>
+                </select>
+                <button id="saveTransBtn">Save</button>
+                <button id="cancelTransBtn">Cancel</button>
+            </div>
+        </div>
+        <!-- Shopping -->
+        <div id="shoppingPane" class="life-pane">
+            <div class="flex-between">
+                <h4>Shopping List</h4>
+                <button id="addItemBtn">+ Item</button>
+            </div>
+            <div id="shoppingListContainer"></div>
+            <div id="newItemForm" style="display: none;">
+                <input type="text" id="newItemName" placeholder="Item name">
+                <button id="saveItemBtn">Save</button>
+            </div>
+        </div>
+        <!-- Goals -->
+        <div id="goalsPane" class="life-pane">
+            <div class="flex-between">
+                <h4>Goals</h4>
+                <button id="addGoalBtn">+ Goal</button>
+                <button id="showGoalSummaryBtn">Summary</button>
+            </div>
+            <div id="goalsList"></div>
+            <div id="newGoalForm" style="display: none;">
+                <input type="text" id="goalName" placeholder="Goal name">
+                <input type="date" id="goalDeadline">
+                <button id="saveGoalBtn">Save</button>
+                <button id="cancelGoalBtn">Cancel</button>
+            </div>
+            <div id="goalSummary" style="margin-top: 16px; background: var(--input-bg); border-radius: 20px; padding: 12px; display: none;"></div>
+        </div>
+        <!-- Wellness -->
+        <div id="wellnessPane" class="life-pane">
+            <h4>Wellness Overview</h4>
+            <div id="wellnessStats"></div>
+        </div>
+        <!-- Tools -->
+        <div id="toolsPane" class="life-pane">
+            <h4>Live Clock</h4>
+            <div id="liveClock" class="clock"></div>
+            <h4>Timer</h4>
+            <div class="flex-between">
+                <input type="number" id="timerMinutes" placeholder="Minutes" value="1">
+                <button id="startTimerBtn">Start</button>
+            </div>
+            <div id="timerDisplay2" class="timer-display">00:00</div>
+            <h4>Stopwatch</h4>
+            <div id="stopwatchDisplay" class="timer-display">00:00:00</div>
+            <div class="flex-between">
+                <button id="stopwatchStartBtn">Start</button>
+                <button id="stopwatchStopBtn">Stop</button>
+                <button id="stopwatchResetBtn">Reset</button>
+            </div>
+            <hr>
+            <h4>Calculator</h4>
+            <div style="background: var(--input-bg); border-radius: 28px; padding: 12px;">
+                <input type="text" id="calcDisplay" readonly value="0" style="text-align: right;">
+                <div class="calc-buttons" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn" data-op="/">/</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn" data-op="*">*</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn" data-op="-">-</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn" data-op="=">=</button>
+                    <button class="calc-btn" data-op="+">+</button>
+                    <button class="calc-btn" data-op="C">C</button>
+                </div>
+            </div>
+            <h4>Unit Converter (km to miles)</h4>
+            <div class="flex-between">
+                <input type="number" id="kmInput" placeholder="km">
+                <span>=</span>
+                <input type="number" id="milesOutput" readonly placeholder="miles">
+            </div>
+            <h4>Loan Calculator</h4>
+            <div class="grid-2col">
+                <input type="number" id="loanAmount" placeholder="Loan amount">
+                <input type="number" id="loanRate" placeholder="Annual interest %">
+                <input type="number" id="loanYears" placeholder="Years">
+            </div>
+            <button id="calcLoanBtn">Calculate</button>
+            <span id="loanResult"></span>
+            <h4>Fuel Cost</h4>
+            <div class="grid-2col">
+                <input type="number" id="distanceKm" placeholder="Distance (km)">
+                <input type="number" id="fuelPrice" placeholder="Price/L">
+                <input type="number" id="fuelEfficiency" placeholder="L/100km">
+            </div>
+            <button id="calcFuelBtn">Calculate</button>
+            <span id="fuelResult"></span>
+            <hr>
+            <h4>Theme</h4>
+            <select id="themeSelect">
+                <option>Dark</option>
+                <option>Light</option>
+            </select>
+            <button id="applyThemeBtn">Apply</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation (reduced and clean) -->
+<div class="nav">
+    <button data-section="dashboard">Home</button>
+    <button data-section="tracker">Tracker</button>
+    <button data-section="calendar">Calendar</button>
+    <button data-section="notes">Notes</button>
+    <button data-section="workout">Workout</button>
+    <button data-section="relationship">Love</button>
+    <button data-section="badhabits">Habits</button>
+    <button data-section="productivity">Tasks</button>
+    <button data-section="health">Health</button>
+    <button data-section="entertainment">Fun</button>
+    <button data-section="memory">Memories</button>
+    <button data-section="life">Tools</button>
+</div>
+
+<script>
+    // ------------------- DATA MODELS -------------------
+    let lifeEntries = {};
+    let relationshipDates = [];
+    let primaryDate = new Date().toISOString().slice(0, 16);
+    let togetherSince = new Date("2023-01-01T00:00").toISOString();
+    let togetherUnitMode = "years";
+    let transactions = [];
+    let shoppingItems = [];
+    let goals = [];
+    let badHabitsMaster = [];
+    let notes = [];
+    let customExercises = [];
+    let todos = [];
+    let tasks = [];
+    let skillChallenges = [];
+    let workoutPlans = [];
+    let nutritionLog = [];
+    let memories = [];
+    let habits = [];
+    let expenses = [];
+    let readingLog = [];
+    let quickNotes = [];
+    let events = [];
+    let birthdays = [];
+    let userPoints = 0;
+    let badges = [];
+
+    let currentSelectedDate = new Date().toISOString().slice(0, 10);
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let chart;
+
+    let timerInterval, meditationInterval, stopwatchInterval;
+    let stopwatchSeconds = 0;
+
+    let gameCards = [], gameMoves = 0, gameSelected = null;
+
+    // Helper functions
+    function getTodayStr() { return new Date().toISOString().slice(0, 10); }
+
+    function getEmptyEntry(dateStr) {
+        return {
+            date: dateStr,
+            workout: { done: false, type: "", duration: "", intensity: "Medium" },
+            meals: { count: 0, calories: null },
+            study: false, write: false, weight: null,
+            mood: 3, sleepHours: 7, waterGlasses: 4, stress: 3, dayRating: 5,
+            sick: false,
+            hobbies: [],
+            music: [],
+            badHabitsLog: {},
+            loveMessages: []
+        };
+    }
+    function ensureEntry(dateStr) { if (!lifeEntries[dateStr]) lifeEntries[dateStr] = getEmptyEntry(dateStr); return lifeEntries[dateStr]; }
+
+    function saveAllData() {
+        const store = {
+            entries: lifeEntries, relDates: relationshipDates, primaryDate, togetherSince,
+            transactions, shoppingItems, goals, badHabitsMaster, notes, customExercises,
+            todos, tasks, skillChallenges, workoutPlans, nutritionLog, memories, habits,
+            expenses, readingLog, quickNotes, userPoints, badges, events, birthdays
+        };
+        localStorage.setItem("lifeos_v16", JSON.stringify(store));
+    }
+
+    function loadAllData() {
+        const raw = localStorage.getItem("lifeos_v16");
+        if (raw) {
+            try {
+                const data = JSON.parse(raw);
+                lifeEntries = data.entries || {};
+                relationshipDates = data.relDates || [];
+                primaryDate = data.primaryDate || new Date().toISOString().slice(0, 16);
+                togetherSince = data.togetherSince || new Date("2023-01-01T00:00").toISOString();
+                transactions = data.transactions || [];
+                shoppingItems = data.shoppingItems || [];
+                goals = data.goals || [];
+                badHabitsMaster = data.badHabitsMaster || [];
+                notes = data.notes || [];
+                customExercises = data.customExercises || [];
+                todos = data.todos || [];
+                tasks = data.tasks || [];
+                skillChallenges = data.skillChallenges || [];
+                workoutPlans = data.workoutPlans || [];
+                nutritionLog = data.nutritionLog || [];
+                memories = data.memories || [];
+                habits = data.habits || [];
+                expenses = data.expenses || [];
+                readingLog = data.readingLog || [];
+                quickNotes = data.quickNotes || [];
+                userPoints = data.userPoints || 0;
+                badges = data.badges || [];
+                events = data.events || [];
+                birthdays = data.birthdays || [];
+            } catch (e) {}
+        }
+        if (!relationshipDates.length) relationshipDates = [{ id: "anniv1", name: "Anniversary", datetimeISO: "2026-02-26T21:21" }];
+    }
+
+    function computeDailyScore(entry) {
+        if (!entry) return 0;
+        let score = 0;
+        if (entry.workout.done) score += 25;
+        score += (Math.min(1, (entry.meals.count || 0) / 3)) * 25;
+        if (entry.study) score += 25;
+        if (entry.write) score += 25;
+        return Math.min(100, Math.round(score));
+    }
+
+    function addPoints(amount) {
+        userPoints += amount;
+        saveAllData();
+        refreshAll();
+    }
+
+    function updateBadges() {
+        let badgeList = [];
+        if (userPoints >= 100) badgeList.push("100 Points");
+        if (tasks.filter(t => t.completed).length >= 5) badgeList.push("Task Master");
+        let streak = parseInt(document.getElementById('streakCount').innerText);
+        if (streak >= 7) badgeList.push("7-Day Streak");
+        document.getElementById('badgesList').innerHTML = badgeList.map(b => `<span class="badge">${b}</span>`).join('');
+    }
+
+    function updateChart() {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        let labels = [], scores = [];
+        let d = new Date();
+        for (let i = 13; i >= 0; i--) {
+            let date = new Date();
+            date.setDate(d.getDate() - i);
+            let ds = date.toISOString().slice(0, 10);
+            let entry = lifeEntries[ds] || getEmptyEntry(ds);
+            labels.push(ds.slice(5));
+            scores.push(computeDailyScore(entry));
+        }
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Daily Score',
+                    data: scores,
+                    borderColor: 'var(--accent)',
+                    backgroundColor: 'var(--accent-glow)',
+                    tension: 0.2,
+                    fill: true,
+                    pointBackgroundColor: '#a855f7'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { labels: { color: 'var(--text-secondary)' } } },
+                scales: { y: { min: 0, max: 100, grid: { color: 'var(--input-border)' } } }
+            }
+        });
+    }
+
+    // Mood advice
+    function applyMood() {
+        let mood = document.getElementById('quickMood').value;
+        let messages = {
+            "😊 Happy": "Your positivity is contagious! Keep spreading joy.",
+            "😐 Neutral": "A calm mind is powerful. Take a small step toward a goal today.",
+            "😔 Sad": "It's okay to feel down. Storms don't last forever. You're stronger than you know.",
+            "😠 Angry": "Deep breath. Anger is a signal, not a solution. Walk away and return with clarity.",
+            "😴 Tired": "Rest is productive. Give yourself permission to recharge."
+        };
+        document.getElementById('moodAdvice').innerHTML = messages[mood] || "I'm here for you.";
+    }
+
+    // Refresh all UI
+    function refreshAll() {
+        const todayStr = getTodayStr();
+        const todayEntry = ensureEntry(todayStr);
+        const score = computeDailyScore(todayEntry);
+        document.getElementById('scoreValue').innerText = score;
+        document.getElementById('topFill').style.width = score + "%";
+        let streak = 0;
+        let d = new Date();
+        while (true) {
+            let ds = d.toISOString().slice(0, 10);
+            let e = lifeEntries[ds];
+            if (e && e.workout.done) streak++;
+            else break;
+            d.setDate(d.getDate() - 1);
+        }
+        document.getElementById('streakCount').innerText = streak;
+        document.getElementById('userPoints').innerText = userPoints;
+        updateBadges();
+        updateChart();
+        renderCalendar();
+        updatePrimaryCountdown();
+        updateTogetherCounter();
+        renderSpecialDates();
+        renderTransactions();
+        renderShoppingList();
+        renderGoals();
+        updateWellnessStats();
+        renderBadHabitsList();
+        renderNotes();
+        renderTodoList();
+        renderWorkoutLibrary();
+        renderLoveMessagesForDate(currentSelectedDate);
+        renderTasks();
+        renderSkillChallenges();
+        renderWorkoutPlans();
+        renderNutrition();
+        renderMemories();
+        renderHabits();
+        renderExpenses();
+        renderReadingLog();
+        renderQuickNotes();
+        renderGameBoard();
+        renderEventsAndBirthdays();
+        checkUpcomingNotifications();
+        if (document.getElementById('tracker').classList.contains('active-section')) updateTrackerFormByDate(currentSelectedDate);
+    }
+
+    // Tracker functions
+    function updateTrackerFormByDate(dateStr) {
+        let entry = ensureEntry(dateStr);
+        document.getElementById('workoutDone').checked = entry.workout.done;
+        document.getElementById('workoutType').value = entry.workout.type || "";
+        document.getElementById('workoutDuration').value = entry.workout.duration || "";
+        document.getElementById('workoutIntensity').value = entry.workout.intensity || "Medium";
+        document.getElementById('mealCount').value = entry.meals.count;
+        document.getElementById('mealCalories').value = entry.meals.calories !== null ? entry.meals.calories : "";
+        document.getElementById('studyDone').checked = entry.study;
+        document.getElementById('writeDone').checked = entry.write;
+        document.getElementById('weightEntry').value = entry.weight !== null ? entry.weight : "";
+        document.getElementById('moodInput').value = entry.mood || 3;
+        document.getElementById('sleepInput').value = entry.sleepHours || 7;
+        document.getElementById('waterInput').value = entry.waterGlasses || 4;
+        document.getElementById('stressInput').value = entry.stress || 3;
+        document.getElementById('sickCheckbox').checked = entry.sick || false;
+        document.getElementById('dayRating').value = entry.dayRating || 5;
+        renderHobbiesMusic();
+    }
+
+    function saveTracker() {
+        const targetDate = currentSelectedDate;
+        let entry = ensureEntry(targetDate);
+        entry.workout = {
+            done: document.getElementById('workoutDone').checked,
+            type: document.getElementById('workoutType').value,
+            duration: document.getElementById('workoutDuration').value,
+            intensity: document.getElementById('workoutIntensity').value
+        };
+        entry.meals = {
+            count: parseInt(document.getElementById('mealCount').value) || 0,
+            calories: document.getElementById('mealCalories').value ? parseInt(document.getElementById('mealCalories').value) : null
+        };
+        entry.study = document.getElementById('studyDone').checked;
+        entry.write = document.getElementById('writeDone').checked;
+        entry.weight = parseFloat(document.getElementById('weightEntry').value) || null;
+        entry.mood = parseInt(document.getElementById('moodInput').value) || 3;
+        entry.sleepHours = parseFloat(document.getElementById('sleepInput').value) || 7;
+        entry.waterGlasses = parseInt(document.getElementById('waterInput').value) || 0;
+        entry.stress = parseInt(document.getElementById('stressInput').value) || 3;
+        entry.sick = document.getElementById('sickCheckbox').checked;
+        entry.dayRating = parseInt(document.getElementById('dayRating').value) || 5;
+        saveAllData();
+        refreshAll();
+        document.getElementById('trackerFeedback').innerText = `Saved ${targetDate}`;
+        setTimeout(() => document.getElementById('trackerFeedback').innerText = "", 1500);
+    }
+
+    function renderHobbiesMusic() {
+        let entry = ensureEntry(currentSelectedDate);
+        let hobbiesHtml = entry.hobbies.map((h, i) => `<div class="list-item"><div class="flex-between"><span>${h.name} ${h.duration ? '(' + h.duration + 'min)' : ''} ${h.isRestDay ? 'Rest day' : ''}</span><button class="delHobbyBtn" data-idx="${i}">✖</button></div></div>`).join('');
+        document.getElementById('hobbiesList').innerHTML = hobbiesHtml || "<div>No hobbies logged</div>";
+        document.querySelectorAll('.delHobbyBtn').forEach(btn => btn.addEventListener('click', () => {
+            entry.hobbies.splice(parseInt(btn.dataset.idx), 1);
+            saveAllData();
+            renderHobbiesMusic();
+        }));
+        let musicHtml = entry.music.map((m, i) => `<div class="list-item"><div class="flex-between"><span>${m.title} - ${m.artist}</span><button class="delSongBtn" data-idx="${i}">✖</button></div></div>`).join('');
+        document.getElementById('musicList').innerHTML = musicHtml || "<div>No songs added</div>";
+        document.querySelectorAll('.delSongBtn').forEach(btn => btn.addEventListener('click', () => {
+            entry.music.splice(parseInt(btn.dataset.idx), 1);
+            saveAllData();
+            renderHobbiesMusic();
+        }));
+    }
+
+    function addHobby() {
+        let name = document.getElementById('newHobbyName').value;
+        let duration = document.getElementById('newHobbyDuration').value;
+        let isRestDay = document.getElementById('isRestDayCheckbox').checked;
+        if (name) {
+            let entry = ensureEntry(currentSelectedDate);
+            entry.hobbies.push({ name, duration, isRestDay });
+            saveAllData();
+            renderHobbiesMusic();
+            document.getElementById('newHobbyName').value = '';
+            document.getElementById('newHobbyDuration').value = '';
+            document.getElementById('isRestDayCheckbox').checked = false;
+        }
+    }
+
+    function addSong() {
+        let title = document.getElementById('newSongTitle').value;
+        let artist = document.getElementById('newSongArtist').value;
+        if (title) {
+            let entry = ensureEntry(currentSelectedDate);
+            entry.music.push({ title, artist });
+            saveAllData();
+            renderHobbiesMusic();
+            document.getElementById('newSongTitle').value = '';
+            document.getElementById('newSongArtist').value = '';
+        }
+    }
+
+    // Calendar functions
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const startWeekday = firstDay.getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        document.getElementById('monthYearDisplay').innerText = `${monthNames[currentMonth]} ${currentYear}`;
+        let gridHtml = "";
+        for (let i = 0; i < startWeekday; i++) gridHtml += `<div class="cal-day" style="opacity:0.3;"></div>`;
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const entry = lifeEntries[dateStr];
+            const hasWorkout = entry && entry.workout.done;
+            const hasNote = entry && (entry.notes?.length || entry.music?.length);
+            const selectedClass = (currentSelectedDate === dateStr) ? "selected" : "";
+            gridHtml += `<div class="cal-day ${selectedClass}" data-date="${dateStr}">
+                <div class="day-num">${d}</div>
+                <div class="badge-dot">${hasWorkout ? '<span class="dot"></span>' : ''}${hasNote ? '<span class="dot" style="background:#a855f7;"></span>' : ''}</div>
+            </div>`;
+        }
+        document.getElementById('calendarGrid').innerHTML = gridHtml;
+        document.querySelectorAll('.cal-day[data-date]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                currentSelectedDate = el.getAttribute('data-date');
+                renderCalendar();
+                updateTrackerFormByDate(currentSelectedDate);
+                renderBadHabitsList();
+                renderLoveMessagesForDate(currentSelectedDate);
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+                document.getElementById('tracker').classList.add('active-section');
+                document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+                document.querySelector('.nav button[data-section="tracker"]').classList.add('active');
+            });
+        });
+    }
+
+    // Events & Birthdays
+    function renderEventsAndBirthdays() {
+        let upcoming = [];
+        events.forEach(e => {
+            let dt = new Date(e.datetimeISO);
+            if (dt >= new Date()) upcoming.push({ type: 'event', name: e.name, datetime: dt, alarm: e.alarm });
+        });
+        birthdays.forEach(b => {
+            let bd = new Date(b.dateISO);
+            let thisYear = new Date(new Date().getFullYear(), bd.getMonth(), bd.getDate());
+            if (thisYear >= new Date()) upcoming.push({ type: 'birthday', name: b.name, datetime: thisYear, notify: b.notify });
+            else {
+                let nextYear = new Date(new Date().getFullYear() + 1, bd.getMonth(), bd.getDate());
+                upcoming.push({ type: 'birthday', name: b.name, datetime: nextYear, notify: b.notify });
+            }
+        });
+        upcoming.sort((a, b) => a.datetime - b.datetime);
+        let html = upcoming.slice(0, 10).map(u => `<div class="list-item"><div class="flex-between"><span>${u.type === 'event' ? '📅' : '🎂'} ${u.name} - ${u.datetime.toLocaleString()}</span></div></div>`).join('');
+        document.getElementById('upcomingEventsList').innerHTML = html || "<div>No upcoming events</div>";
+    }
+
+    function addEvent() {
+        let name = document.getElementById('eventName').value;
+        let dt = document.getElementById('eventDateTime').value;
+        let alarm = document.getElementById('eventAlarm').checked;
+        if (name && dt) {
+            events.push({ id: Date.now().toString(), name, datetimeISO: dt, alarm });
+            saveAllData();
+            renderEventsAndBirthdays();
+            document.getElementById('eventForm').style.display = 'none';
+            document.getElementById('eventName').value = '';
+            document.getElementById('eventDateTime').value = '';
+            document.getElementById('eventAlarm').checked = false;
+            if (alarm) scheduleNotification(`Event: ${name}`, new Date(dt));
+        }
+    }
+
+    function addBirthday() {
+        let name = document.getElementById('birthdayName').value;
+        let date = document.getElementById('birthdayDate').value;
+        let notify = document.getElementById('birthdayNotify').checked;
+        if (name && date) {
+            birthdays.push({ id: Date.now().toString(), name, dateISO: date, notify });
+            saveAllData();
+            renderEventsAndBirthdays();
+            document.getElementById('birthdayForm').style.display = 'none';
+            document.getElementById('birthdayName').value = '';
+            document.getElementById('birthdayDate').value = '';
+            document.getElementById('birthdayNotify').checked = false;
+            if (notify) scheduleBirthdayReminders(name, new Date(date));
+        }
+    }
+
+    function scheduleNotification(title, date) {
+        let delay = date - new Date();
+        if (delay > 0 && delay < 30 * 24 * 60 * 60 * 1000) {
+            setTimeout(() => {
+                if (Notification.permission === "granted") new Notification(title, { body: "It's time!" });
+                else alert(`Reminder: ${title}`);
+            }, delay);
+        }
+    }
+
+    function scheduleBirthdayReminders(name, birthDate) {
+        let now = new Date();
+        let thisYearBirth = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+        let weekBefore = new Date(thisYearBirth);
+        weekBefore.setDate(weekBefore.getDate() - 7);
+        if (weekBefore > now) {
+            setTimeout(() => {
+                if (Notification.permission === "granted") new Notification(`Birthday in 1 week: ${name}`, { body: "Prepare a gift!" });
+                else alert(`Reminder: ${name}'s birthday in 1 week`);
+            }, weekBefore - now);
+        }
+        if (thisYearBirth > now) {
+            setTimeout(() => {
+                if (Notification.permission === "granted") new Notification(`Happy Birthday ${name}!`, { body: "Celebrate today!" });
+                else alert(`Today is ${name}'s birthday!`);
+            }, thisYearBirth - now);
+        }
+    }
+
+    function checkUpcomingNotifications() {
+        if (Notification.permission !== "granted") Notification.requestPermission();
+        events.forEach(e => { if (e.alarm) scheduleNotification(`Event: ${e.name}`, new Date(e.datetimeISO)); });
+        birthdays.forEach(b => { if (b.notify) scheduleBirthdayReminders(b.name, new Date(b.dateISO)); });
+    }
+
+    // Relationship functions
+    function updatePrimaryCountdown() {
+        let target = new Date(primaryDate);
+        let now = new Date();
+        let diff = target - now;
+        if (diff <= 0) { document.getElementById('primaryCountdown').innerHTML = "Event passed!"; return; }
+        let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        let hours = Math.floor((diff % 86400000) / 3600000);
+        let mins = Math.floor((diff % 3600000) / 60000);
+        let secs = Math.floor((diff % 60000) / 1000);
+        document.getElementById('primaryCountdown').innerHTML = `${days}d ${hours}h ${mins}m ${secs}s`;
+    }
+
+    function updateTogetherCounter() {
+        let start = new Date(togetherSince);
+        let now = new Date();
+        let diff = now - start;
+        if (diff < 0) { document.getElementById('togetherCounter').innerText = "Set a valid start date"; return; }
+        let totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+        let hours = Math.floor((diff % 86400000) / 3600000);
+        let mins = Math.floor((diff % 3600000) / 60000);
+        let secs = Math.floor((diff % 60000) / 1000);
+        if (togetherUnitMode === "days") {
+            document.getElementById('togetherCounter').innerText = `${totalDays} days, ${hours}h ${mins}m ${secs}s together`;
+        } else {
+            let years = Math.floor(totalDays / 365.25);
+            let daysRem = Math.floor(totalDays % 365.25);
+            document.getElementById('togetherCounter').innerText = `${years} years, ${daysRem} days, ${hours}h ${mins}m ${secs}s together`;
+        }
+    }
+
+    function renderSpecialDates() {
+        let container = document.getElementById('specialDatesList');
+        if (!relationshipDates.length) { container.innerHTML = "<div>No special dates</div>"; return; }
+        container.innerHTML = relationshipDates.map(rel => {
+            let target = new Date(rel.datetimeISO);
+            let diff = target - new Date();
+            let days = Math.floor(diff / 86400000);
+            let hours = Math.floor((diff % 86400000) / 3600000);
+            let mins = Math.floor((diff % 3600000) / 60000);
+            let secs = Math.floor((diff % 60000) / 1000);
+            let cd = diff > 0 ? `${days}d ${hours}h ${mins}m ${secs}s` : "Passed";
+            return `<div class="list-item"><div class="flex-between"><div><strong>${rel.name}</strong><br>${rel.datetimeISO.replace('T', ' ')}</div><div>${cd}</div><button class="delRelBtn" data-id="${rel.id}">✖</button></div></div>`;
+        }).join('');
+        document.querySelectorAll('.delRelBtn').forEach(btn => btn.addEventListener('click', () => {
+            relationshipDates = relationshipDates.filter(r => r.id != btn.dataset.id);
+            saveAllData();
+            renderSpecialDates();
+        }));
+    }
+
+    function addSpecialDate() {
+        let name = document.getElementById('specialName').value;
+        let dt = document.getElementById('specialDateTime').value;
+        if (name && dt) {
+            relationshipDates.push({ id: Date.now().toString(), name, datetimeISO: dt });
+            saveAllData();
+            renderSpecialDates();
+            document.getElementById('newSpecialForm').style.display = 'none';
+            document.getElementById('specialName').value = '';
+            document.getElementById('specialDateTime').value = '';
+        }
+    }
+
+    // Love Messages
+    function renderLoveMessagesForDate(dateStr) {
+        let entry = ensureEntry(dateStr);
+        let container = document.getElementById('loveMessagesList');
+        if (!entry.loveMessages || entry.loveMessages.length === 0) {
+            container.innerHTML = "<div>No love messages yet. Write one above.</div>";
+            return;
+        }
+        container.innerHTML = entry.loveMessages.map((msg, idx) => `<div class="list-item"><div class="flex-between"><div><em>${msg.text}</em><br><small>${msg.timestamp || ""}</small></div><button class="delLoveMsgBtn" data-idx="${idx}">✖</button></div></div>`).join('');
+        document.querySelectorAll('.delLoveMsgBtn').forEach(btn => btn.addEventListener('click', () => {
+            entry.loveMessages.splice(parseInt(btn.dataset.idx), 1);
+            saveAllData();
+            renderLoveMessagesForDate(currentSelectedDate);
+        }));
+    }
+
+    function addLoveMessage() {
+        let text = document.getElementById('newLoveMsg').value.trim();
+        if (text) {
+            let entry = ensureEntry(currentSelectedDate);
+            if (!entry.loveMessages) entry.loveMessages = [];
+            entry.loveMessages.push({ text, timestamp: new Date().toLocaleString() });
+            saveAllData();
+            renderLoveMessagesForDate(currentSelectedDate);
+            document.getElementById('newLoveMsg').value = '';
+        }
+    }
+
+    function monthlyLoveSummary() {
+        let today = new Date();
+        let year = today.getFullYear(), month = today.getMonth();
+        let start = new Date(year, month, 1);
+        let end = new Date(year, month + 1, 0);
+        let messages = [];
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            let ds = d.toISOString().slice(0, 10);
+            let entry = lifeEntries[ds];
+            if (entry && entry.loveMessages && entry.loveMessages.length) {
+                entry.loveMessages.forEach(msg => {
+                    messages.push(`📅 ${ds}: ${msg.text}`);
+                });
+            }
+        }
+        let output = messages.length ? `Love Messages (${year}-${month + 1}):\n` + messages.join("\n") : "No messages this month. Write daily to surprise her!";
+        document.getElementById('loveSummary').innerHTML = `<pre style="white-space:pre-wrap;">${output}</pre>`;
+    }
+
+    // Bad Habits
+    function renderBadHabitsList() {
+        let container = document.getElementById('badHabitsList');
+        let entry = ensureEntry(currentSelectedDate);
+        if (!badHabitsMaster.length) { container.innerHTML = "<div>No bad habits added yet. Add one above.</div>"; return; }
+        container.innerHTML = badHabitsMaster.map((h, idx) => {
+            let logged = entry.badHabitsLog[h] || { engaged: false };
+            return `<div class="list-item"><div class="flex-between"><label><input type="checkbox" class="habitCheck" data-habit="${h}" ${logged.engaged ? 'checked' : ''}> ${h}</label><input type="number" placeholder="Intensity" class="habitIntensity" data-habit="${h}" value="${logged.intensity || ''}" style="width:80px;"><button class="delHabitBtn" data-habit="${h}">✖</button></div></div>`;
+        }).join('');
+        document.querySelectorAll('.habitCheck').forEach(ch => ch.addEventListener('change', (e) => {
+            let habit = ch.dataset.habit;
+            let intensity = document.querySelector(`.habitIntensity[data-habit="${habit}"]`).value;
+            if (!entry.badHabitsLog[habit]) entry.badHabitsLog[habit] = {};
+            entry.badHabitsLog[habit].engaged = ch.checked;
+            if (intensity) entry.badHabitsLog[habit].intensity = parseInt(intensity);
+            saveAllData();
+        }));
+        document.querySelectorAll('.habitIntensity').forEach(inp => inp.addEventListener('change', (e) => {
+            let habit = inp.dataset.habit;
+            let intensity = inp.value;
+            if (!entry.badHabitsLog[habit]) entry.badHabitsLog[habit] = {};
+            entry.badHabitsLog[habit].intensity = intensity ? parseInt(intensity) : null;
+            saveAllData();
+        }));
+        document.querySelectorAll('.delHabitBtn').forEach(btn => btn.addEventListener('click', () => {
+            let habit = btn.dataset.habit;
+            badHabitsMaster = badHabitsMaster.filter(h => h !== habit);
+            saveAllData();
+            renderBadHabitsList();
+        }));
+    }
+
+    function addBadHabit() {
+        let name = document.getElementById('newBadHabitName').value;
+        if (name) {
+            badHabitsMaster.push(name);
+            saveAllData();
+            renderBadHabitsList();
+            document.getElementById('newBadHabitName').value = '';
+        }
+    }
+
+    // Notes
+    function renderNotes() {
+        let container = document.getElementById('notesListContainer');
+        if (!notes.length) { container.innerHTML = "<div>No notes yet. Tap + New Note</div>"; return; }
+        container.innerHTML = notes.map(n => `<div class="memory-card"><div class="flex-between"><strong>${n.title || 'Untitled'}</strong><button class="deleteNoteBtn" data-id="${n.id}">✖</button></div><div>${n.content.substring(0, 100)}...</div><small>${n.createdAt}</small></div>`).join('');
+        document.querySelectorAll('.deleteNoteBtn').forEach(btn => btn.addEventListener('click', () => {
+            notes = notes.filter(n => n.id != btn.dataset.id);
+            saveAllData();
+            renderNotes();
+        }));
+    }
+
+    let editingNoteId = null;
+    function openNoteEditor(id = null) {
+        editingNoteId = id;
+        let note = notes.find(n => n.id == id);
+        document.getElementById('noteTitle').value = note ? note.title : '';
+        document.getElementById('noteContent').innerHTML = note ? note.content : '';
+        document.getElementById('noteEditorPanel').style.display = 'block';
+    }
+
+    function saveNote() {
+        let title = document.getElementById('noteTitle').value;
+        let content = document.getElementById('noteContent').innerHTML;
+        if (!content.trim()) return;
+        if (editingNoteId) {
+            let note = notes.find(n => n.id == editingNoteId);
+            if (note) { note.title = title; note.content = content; }
+        } else {
+            notes.push({ id: Date.now().toString(), title, content, createdAt: new Date().toLocaleString() });
+        }
+        saveAllData();
+        renderNotes();
+        document.getElementById('noteEditorPanel').style.display = 'none';
+        document.getElementById('noteTitle').value = '';
+        document.getElementById('noteContent').innerHTML = '';
+        editingNoteId = null;
+    }
+
+    // To-Do List
+    function renderTodoList() {
+        let container = document.getElementById('todoListContainer');
+        if (!todos.length) { container.innerHTML = "<div>No tasks yet. Add one above.</div>"; return; }
+        container.innerHTML = todos.map(t => `
+            <div class="todo-item">
+                <input type="checkbox" class="todoCheck" data-id="${t.id}" ${t.completed ? 'checked' : ''}>
+                <span style="${t.completed ? 'text-decoration:line-through; opacity:0.7;' : ''}">${t.text}</span>
+                <button class="deleteTodoBtn" data-id="${t.id}">✖</button>
+            </div>
+        `).join('');
+        document.querySelectorAll('.todoCheck').forEach(ch => ch.addEventListener('change', (e) => {
+            let id = ch.dataset.id;
+            let todo = todos.find(t => t.id == id);
+            if (todo) todo.completed = ch.checked;
+            saveAllData();
+            renderTodoList();
+        }));
+        document.querySelectorAll('.deleteTodoBtn').forEach(btn => btn.addEventListener('click', () => {
+            todos = todos.filter(t => t.id != btn.dataset.id);
+            saveAllData();
+            renderTodoList();
+        }));
+    }
+
+    function addTodo() {
+        let text = document.getElementById('newTodoText').value.trim();
+        if (text) {
+            todos.push({ id: Date.now().toString(), text, completed: false });
+            saveAllData();
+            renderTodoList();
+            document.getElementById('newTodoText').value = '';
+        }
+    }
+
+    // Workout Library
+    function renderWorkoutLibrary() {
+        let container = document.getElementById('workoutLibrary');
+        let exercises = [...customExercises];
+        if (!exercises.length) exercises = [{ name: "Push-ups", sets: "3", reps: "12" }, { name: "Squats", sets: "3", reps: "15" }];
+        container.innerHTML = exercises.map((ex, i) => `
+            <div class="exercise-card">
+                <div class="flex-between">
+                    <strong>${ex.name}</strong>
+                    <div>
+                        <button class="startTimerBtn" data-time="60">Timer (60s)</button>
+                        <button class="delExBtn" data-idx="${i}">✖</button>
+                    </div>
+                </div>
+                <div>${ex.sets} sets × ${ex.reps} reps</div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.startTimerBtn').forEach(btn => btn.addEventListener('click', () => { let sec = parseInt(btn.dataset.time); startTimer(sec); }));
+        document.querySelectorAll('.delExBtn').forEach(btn => btn.addEventListener('click', () => { customExercises.splice(parseInt(btn.dataset.idx), 1); saveAllData(); renderWorkoutLibrary(); }));
+    }
+
+    function addCustomExercise() {
+        let name = document.getElementById('customExName').value;
+        let sets = document.getElementById('customExSets').value;
+        let reps = document.getElementById('customExReps').value;
+        if (name && sets && reps) {
+            customExercises.push({ name, sets, reps });
+            saveAllData();
+            renderWorkoutLibrary();
+            document.getElementById('customExName').value = '';
+            document.getElementById('customExSets').value = '';
+            document.getElementById('customExReps').value = '';
+        }
+    }
+
+    let timerSecs = 0, timerInt;
+    function startTimer(seconds) {
+        if (timerInt) clearInterval(timerInt);
+        timerSecs = seconds;
+        document.getElementById('timerArea').style.display = 'block';
+        function updateDisplay() {
+            let mins = Math.floor(timerSecs / 60);
+            let secs = timerSecs % 60;
+            document.getElementById('timerDisplay').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        updateDisplay();
+        timerInt = setInterval(() => {
+            if (timerSecs <= 0) {
+                clearInterval(timerInt);
+                document.getElementById('timerArea').style.display = 'none';
+                alert('Time is up!');
+            } else {
+                timerSecs--;
+                updateDisplay();
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInt) clearInterval(timerInt);
+        document.getElementById('timerArea').style.display = 'none';
+    }
+
+    // Tasks
+    function renderTasks() {
+        let container = document.getElementById('tasksListProd');
+        if (!tasks.length) { container.innerHTML = "<div>No tasks yet. Add one.</div>"; return; }
+        container.innerHTML = tasks.map(t => `
+            <div class="task-item">
+                <div class="flex-between"><strong>${t.name}</strong><div><input type="checkbox" ${t.completed ? 'checked' : ''} data-id="${t.id}" class="taskComplete"> <button class="delTaskBtn" data-id="${t.id}">✖</button></div></div>
+                <div>Sub: ${t.subTasks || 'none'} | Priority: ${t.priority} | Deadline: ${t.deadline || 'none'}</div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.taskComplete').forEach(ch => ch.addEventListener('change', (e) => {
+            let id = ch.dataset.id;
+            let task = tasks.find(t => t.id == id);
+            if (task) { task.completed = ch.checked; if (ch.checked) addPoints(10); saveAllData(); renderTasks(); refreshAll(); }
+        }));
+        document.querySelectorAll('.delTaskBtn').forEach(btn => btn.addEventListener('click', () => {
+            tasks = tasks.filter(t => t.id != btn.dataset.id);
+            saveAllData();
+            renderTasks();
+            refreshAll();
+        }));
+    }
+
+    function addTaskProd() {
+        let name = document.getElementById('taskNameProd').value;
+        let sub = document.getElementById('taskSubProd').value;
+        let deadline = document.getElementById('taskDeadlineProd').value;
+        let priority = document.getElementById('taskPriorityProd').value;
+        if (name) {
+            tasks.push({ id: Date.now().toString(), name, subTasks: sub, deadline, priority, completed: false });
+            saveAllData();
+            renderTasks();
+            document.getElementById('newTaskFormProd').style.display = 'none';
+            refreshAll();
+        }
+    }
+
+    // Skill Challenges
+    function renderSkillChallenges() {
+        let container = document.getElementById('skillChallengesList');
+        if (!skillChallenges.length) { container.innerHTML = "<div>No challenges. Add one!</div>"; return; }
+        container.innerHTML = skillChallenges.map((c, i) => `<div class="task-item flex-between"><span>${c.name} ${c.completed ? '✓' : ''}</span><div><button class="completeChallengeBtn" data-idx="${i}">Complete</button><button class="delChallengeBtn" data-idx="${i}">✖</button></div></div>`).join('');
+        document.querySelectorAll('.completeChallengeBtn').forEach(btn => btn.addEventListener('click', () => {
+            let idx = btn.dataset.idx;
+            skillChallenges[idx].completed = true;
+            addPoints(15);
+            saveAllData();
+            renderSkillChallenges();
+            refreshAll();
+        }));
+        document.querySelectorAll('.delChallengeBtn').forEach(btn => btn.addEventListener('click', () => {
+            skillChallenges.splice(btn.dataset.idx, 1);
+            saveAllData();
+            renderSkillChallenges();
+        }));
+    }
+
+    function addChallenge() {
+        let name = document.getElementById('newChallenge').value;
+        if (name) {
+            skillChallenges.push({ name, completed: false });
+            saveAllData();
+            renderSkillChallenges();
+            document.getElementById('newChallenge').value = '';
+        }
+    }
+
+    // Health & Wellness
+    function renderWorkoutPlans() {
+        let container = document.getElementById('workoutPlansList');
+        if (!workoutPlans.length) { container.innerHTML = "<div>No plans. Add one.</div>"; return; }
+        container.innerHTML = workoutPlans.map((p, i) => `<div class="task-item flex-between"><span>${p.name}: ${p.details}</span><div><button class="completeWorkoutBtn" data-idx="${i}">Complete</button><button class="delWorkoutBtn" data-idx="${i}">✖</button></div></div>`).join('');
+        document.querySelectorAll('.completeWorkoutBtn').forEach(btn => btn.addEventListener('click', () => { addPoints(20); alert("Workout completed! +20 points"); }));
+        document.querySelectorAll('.delWorkoutBtn').forEach(btn => btn.addEventListener('click', () => { workoutPlans.splice(btn.dataset.idx, 1); saveAllData(); renderWorkoutPlans(); }));
+    }
+
+    function addWorkoutPlan() {
+        let name = document.getElementById('newWorkoutPlan').value;
+        let details = document.getElementById('newWorkoutDetails').value;
+        if (name) {
+            workoutPlans.push({ name, details });
+            saveAllData();
+            renderWorkoutPlans();
+            document.getElementById('newWorkoutPlan').value = '';
+            document.getElementById('newWorkoutDetails').value = '';
+        }
+    }
+
+    function renderNutrition() {
+        let container = document.getElementById('nutritionHistory');
+        container.innerHTML = nutritionLog.slice(-5).map(n => `<div>${n.date}: ${n.calories} cal, ${n.protein}g protein</div>`).join('');
+    }
+
+    function saveNutrition() {
+        let cals = parseInt(document.getElementById('caloriesInput').value);
+        let protein = parseInt(document.getElementById('proteinInput').value);
+        if (!isNaN(cals)) {
+            nutritionLog.push({ date: getTodayStr(), calories: cals, protein: protein || 0 });
+            saveAllData();
+            renderNutrition();
+            document.getElementById('caloriesInput').value = '';
+            document.getElementById('proteinInput').value = '';
+        }
+    }
+
+    let medSeconds = 0, medIntervalVar;
+    function startMeditation() {
+        if (medIntervalVar) clearInterval(medIntervalVar);
+        medSeconds = 300;
+        document.getElementById('meditationTimer').style.display = 'block';
+        function updateMed() {
+            let mins = Math.floor(medSeconds / 60);
+            let secs = medSeconds % 60;
+            document.getElementById('meditationTimer').innerHTML = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            if (medSeconds <= 0) {
+                clearInterval(medIntervalVar);
+                alert("Meditation complete! +20 points");
+                addPoints(20);
+                document.getElementById('meditationTimer').style.display = 'none';
+            } else {
+                medSeconds--;
+            }
+        }
+        updateMed();
+        medIntervalVar = setInterval(updateMed, 1000);
+    }
+
+    function breathingExercise() {
+        alert("4-7-8 Breathing: Inhale 4 sec, hold 7, exhale 8. Repeat 4 times.");
+    }
+
+    // Entertainment
+    function recommendMusic() {
+        let mood = document.getElementById('moodSelect').value;
+        let songs = {
+            Happy: ["Happy - Pharrell", "Walking on Sunshine"],
+            Chill: ["Lofi Beats", "Weightless"],
+            Energetic: ["Eye of the Tiger", "Uptown Funk"],
+            Sad: ["Someone Like You", "Fix You"]
+        };
+        let rec = songs[mood] || ["No recommendations"];
+        document.getElementById('musicRecommendations').innerHTML = rec.map(s => `<div>🎵 ${s}</div>`).join('');
+    }
+
+    function initGame() {
+        let icons = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+        let deck = [...icons, ...icons];
+        for (let i = deck.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+        gameCards = deck.map((icon, idx) => ({ icon, flipped: false, matched: false, id: idx }));
+        gameMoves = 0;
+        gameSelected = null;
+        document.getElementById('gameScore').innerText = `Moves: ${gameMoves}`;
+        renderGameBoard();
+    }
+
+    function renderGameBoard() {
+        let grid = document.getElementById('memoryGameGrid');
+        grid.innerHTML = gameCards.map((c, i) => `<div class="game-card ${c.flipped || c.matched ? 'selected' : ''}" data-idx="${i}">${c.flipped || c.matched ? c.icon : '?'}</div>`).join('');
+        document.querySelectorAll('.game-card').forEach(el => el.addEventListener('click', (e) => {
+            let idx = parseInt(el.dataset.idx);
+            if (gameCards[idx].matched || gameCards[idx].flipped) return;
+            if (gameSelected === null) {
+                gameCards[idx].flipped = true;
+                gameSelected = idx;
+                renderGameBoard();
+            } else {
+                gameMoves++;
+                document.getElementById('gameScore').innerText = `Moves: ${gameMoves}`;
+                let first = gameCards[gameSelected];
+                let second = gameCards[idx];
+                if (first.icon === second.icon) {
+                    first.matched = true;
+                    second.matched = true;
+                    first.flipped = false;
+                    second.flipped = false;
+                    gameSelected = null;
+                    if (gameCards.every(c => c.matched)) {
+                        alert(`You won in ${gameMoves} moves! +50 points`);
+                        addPoints(50);
+                        initGame();
+                    }
+                    renderGameBoard();
+                } else {
+                    setTimeout(() => {
+                        first.flipped = false;
+                        second.flipped = false;
+                        gameSelected = null;
+                        renderGameBoard();
+                    }, 500);
+                    renderGameBoard();
+                }
+            }
+        }));
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    // Memory
+    function renderMemories() {
+        let container = document.getElementById('memoriesList');
+        if (!memories.length) { container.innerHTML = "<div>No memories yet. Add one.</div>"; return; }
+        container.innerHTML = memories.map(m => `<div class="memory-card"><div class="flex-between"><strong>${m.title}</strong><button class="delMemoryBtn" data-id="${m.id}">✖</button></div><img src="${m.imageBase64}" style="max-width:100%; border-radius:16px;"><div>${new Date(m.date).toLocaleDateString()}</div></div>`).join('');
+        document.querySelectorAll('.delMemoryBtn').forEach(btn => btn.addEventListener('click', () => {
+            memories = memories.filter(m => m.id != btn.dataset.id);
+            saveAllData();
+            renderMemories();
+        }));
+    }
+
+    function addMemory() {
+        let title = document.getElementById('memoryTitle').value;
+        let file = document.getElementById('memoryImage').files[0];
+        if (title && file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                memories.push({ id: Date.now().toString(), title, imageBase64: e.target.result, date: new Date().toISOString() });
+                saveAllData();
+                renderMemories();
+                document.getElementById('memoryTitle').value = '';
+                document.getElementById('memoryImage').value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Habit Builder
+    function renderHabits() {
+        let container = document.getElementById('habitsList');
+        if (!habits.length) { container.innerHTML = "<div>No habits. Add one.</div>"; return; }
+        container.innerHTML = habits.map((h, i) => `<div class="task-item flex-between"><span>${h.name} (Streak: ${h.streak || 0})</span><div><button class="checkHabitBtn" data-idx="${i}">Today</button><button class="delHabitBtn" data-idx="${i}">✖</button></div></div>`).join('');
+        document.querySelectorAll('.checkHabitBtn').forEach(btn => btn.addEventListener('click', () => {
+            let idx = parseInt(btn.dataset.idx);
+            let habit = habits[idx];
+            let today = getTodayStr();
+            if (habit.lastChecked !== today) {
+                habit.streak = (habit.streak || 0) + 1;
+                habit.lastChecked = today;
+                addPoints(5);
+                saveAllData();
+                renderHabits();
+                refreshAll();
+            } else alert("Already checked today!");
+        }));
+        document.querySelectorAll('.delHabitBtn').forEach(btn => btn.addEventListener('click', () => {
+            habits.splice(parseInt(btn.dataset.idx), 1);
+            saveAllData();
+            renderHabits();
+        }));
+    }
+
+    function addHabit() {
+        let name = document.getElementById('newHabit').value;
+        if (name) {
+            habits.push({ name, streak: 0, lastChecked: null });
+            saveAllData();
+            renderHabits();
+            document.getElementById('newHabit').value = '';
+        }
+    }
+
+    // Expense Tracker
+    function renderExpenses() {
+        let container = document.getElementById('expensesList');
+        let total = expenses.reduce((s, e) => s + e.amount, 0);
+        container.innerHTML = expenses.slice().reverse().map(e => `<div>${e.date}: ${e.desc} - $${e.amount}</div>`).join('') + `<strong>Total: $${total}</strong>`;
+    }
+
+    function addExpense() {
+        let desc = document.getElementById('expenseDesc').value;
+        let amt = parseFloat(document.getElementById('expenseAmount').value);
+        if (desc && !isNaN(amt)) {
+            expenses.push({ desc, amount: amt, date: getTodayStr() });
+            saveAllData();
+            renderExpenses();
+            document.getElementById('expenseDesc').value = '';
+            document.getElementById('expenseAmount').value = '';
+        }
+    }
+
+    // Reading Tracker
+    function renderReadingLog() {
+        let container = document.getElementById('readingLog');
+        container.innerHTML = readingLog.slice().reverse().map(l => `<div>${l.date}: ${l.book} - ${l.pages} pages</div>`).join('');
+    }
+
+    function logReading() {
+        let book = document.getElementById('bookTitle').value;
+        let pages = parseInt(document.getElementById('pagesRead').value);
+        if (book && !isNaN(pages)) {
+            readingLog.push({ book, pages, date: getTodayStr() });
+            addPoints(pages);
+            saveAllData();
+            renderReadingLog();
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('pagesRead').value = '';
+            refreshAll();
+        }
+    }
+
+    // Quick Capture
+    function renderQuickNotes() {
+        let container = document.getElementById('quickNotesList');
+        container.innerHTML = quickNotes.slice().reverse().map(n => `<div>${new Date(n.date).toLocaleString()}: ${n.text}</div>`).join('');
+    }
+
+    function addQuickNote() {
+        let text = document.getElementById('quickNote').value;
+        if (text) {
+            quickNotes.push({ text, date: new Date().toISOString() });
+            saveAllData();
+            renderQuickNotes();
+            document.getElementById('quickNote').value = '';
+        }
+    }
+
+    // Life Tools (Money, Shopping, Goals, etc.)
+    function renderTransactions() {
+        let container = document.getElementById('transactionsList');
+        container.innerHTML = transactions.map(t => `<div class="list-item"><div class="flex-between"><span>${t.desc}: $${t.amount} (${t.type})</span><button class="delTransBtn" data-id="${t.id}">✖</button></div></div>`).join('');
+        document.querySelectorAll('.delTransBtn').forEach(btn => btn.addEventListener('click', () => {
+            transactions = transactions.filter(t => t.id != btn.dataset.id);
+            saveAllData();
+            renderTransactions();
+            updateBalance();
+        }));
+        updateBalance();
+    }
+
+    function updateBalance() {
+        let bal = transactions.reduce((s, t) => t.type === 'income' ? s + t.amount : s - t.amount, 0);
+        document.getElementById('balance').innerText = bal.toFixed(2);
+    }
+
+    function addTransaction() {
+        let desc = document.getElementById('transDesc').value;
+        let amt = parseFloat(document.getElementById('transAmount').value);
+        let type = document.getElementById('transType').value;
+        if (desc && !isNaN(amt)) {
+            transactions.push({ id: Date.now().toString(), desc, amount: amt, type });
+            saveAllData();
+            renderTransactions();
+            document.getElementById('transactionForm').style.display = 'none';
+            document.getElementById('transDesc').value = '';
+            document.getElementById('transAmount').value = '';
+        }
+    }
+
+    function renderShoppingList() {
+        let container = document.getElementById('shoppingListContainer');
+        container.innerHTML = shoppingItems.map(it => `<div class="list-item"><div class="flex-between"><label><input type="checkbox" ${it.checked ? 'checked' : ''} data-id="${it.id}" class="itemCheck"> ${it.name}</label><button class="delItemBtn" data-id="${it.id}">✖</button></div></div>`).join('');
+        document.querySelectorAll('.itemCheck').forEach(ch => ch.addEventListener('change', (e) => {
+            let id = ch.dataset.id;
+            let item = shoppingItems.find(i => i.id == id);
+            if (item) item.checked = ch.checked;
+            saveAllData();
+            renderShoppingList();
+        }));
+        document.querySelectorAll('.delItemBtn').forEach(btn => btn.addEventListener('click', () => {
+            shoppingItems = shoppingItems.filter(i => i.id != btn.dataset.id);
+            saveAllData();
+            renderShoppingList();
+        }));
+    }
+
+    function addShoppingItem() {
+        let name = document.getElementById('newItemName').value;
+        if (name) {
+            shoppingItems.push({ id: Date.now().toString(), name, checked: false });
+            saveAllData();
+            renderShoppingList();
+            document.getElementById('newItemForm').style.display = 'none';
+            document.getElementById('newItemName').value = '';
+        }
+    }
+
+    function renderGoals() {
+        let container = document.getElementById('goalsList');
+        container.innerHTML = goals.map(g => `<div class="list-item"><div><b>${g.name}</b><br>Deadline: ${g.deadline || 'none'}<br>Progress: <input type="range" min="0" max="100" value="${g.progress || 0}" data-id="${g.id}" class="goalProgress"> <label><input type="checkbox" class="goalAchieved" data-id="${g.id}" ${g.achieved ? 'checked' : ''}> Achieved</label></div><button class="delGoalBtn" data-id="${g.id}">✖</button></div>`).join('');
+        document.querySelectorAll('.goalProgress').forEach(sl => sl.addEventListener('input', (e) => {
+            let id = sl.dataset.id;
+            let goal = goals.find(g => g.id == id);
+            if (goal) goal.progress = parseInt(sl.value);
+            saveAllData();
+            renderGoals();
+        }));
+        document.querySelectorAll('.goalAchieved').forEach(ch => ch.addEventListener('change', (e) => {
+            let id = ch.dataset.id;
+            let goal = goals.find(g => g.id == id);
+            if (goal) goal.achieved = ch.checked;
+            saveAllData();
+            renderGoals();
+        }));
+        document.querySelectorAll('.delGoalBtn').forEach(btn => btn.addEventListener('click', () => {
+            goals = goals.filter(g => g.id != btn.dataset.id);
+            saveAllData();
+            renderGoals();
+        }));
+    }
+
+    function addGoal() {
+        let name = document.getElementById('goalName').value;
+        let deadline = document.getElementById('goalDeadline').value;
+        if (name) {
+            goals.push({ id: Date.now().toString(), name, deadline, progress: 0, achieved: false });
+            saveAllData();
+            renderGoals();
+            document.getElementById('newGoalForm').style.display = 'none';
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalDeadline').value = '';
+        }
+    }
+
+    function showGoalSummary() {
+        let achieved = goals.filter(g => g.achieved);
+        let notAchieved = goals.filter(g => !g.achieved);
+        let summaryHtml = `<h4>Achieved (${achieved.length})</h4>${achieved.map(g => `<div>✓ ${g.name}</div>`).join('') || 'None'}<h4>Not Achieved (${notAchieved.length})</h4>${notAchieved.map(g => `<div>✗ ${g.name} (deadline: ${g.deadline || 'none'})</div>`).join('') || 'None'}`;
+        document.getElementById('goalSummary').innerHTML = summaryHtml;
+        document.getElementById('goalSummary').style.display = 'block';
+    }
+
+    function updateWellnessStats() {
+        let avgMood = Object.values(lifeEntries).slice(-7).reduce((s, e) => s + (e.mood || 3), 0) / 7;
+        document.getElementById('wellnessStats').innerHTML = `<p>Last 7 days avg mood: ${avgMood.toFixed(1)}/5</p><p>Water avg: ${(Object.values(lifeEntries).slice(-7).reduce((s, e) => s + (e.waterGlasses || 0), 0) / 7).toFixed(1)} glasses</p>`;
+    }
+
+    // Tools functions
+    let timer2Interval, timer2Secs = 0;
+    function startTimer2() {
+        if (timer2Interval) clearInterval(timer2Interval);
+        let mins = parseInt(document.getElementById('timerMinutes').value) || 0;
+        timer2Secs = mins * 60;
+        timer2Interval = setInterval(() => {
+            if (timer2Secs <= 0) {
+                clearInterval(timer2Interval);
+                document.getElementById('timerDisplay2').innerHTML = "Time's up!";
+            } else {
+                timer2Secs--;
+                let m = Math.floor(timer2Secs / 60);
+                let s = timer2Secs % 60;
+                document.getElementById('timerDisplay2').innerHTML = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    function stopwatchStart() {
+        if (stopwatchInterval) clearInterval(stopwatchInterval);
+        stopwatchInterval = setInterval(() => {
+            stopwatchSeconds++;
+            let h = Math.floor(stopwatchSeconds / 3600);
+            let m = Math.floor((stopwatchSeconds % 3600) / 60);
+            let s = stopwatchSeconds % 60;
+            document.getElementById('stopwatchDisplay').innerHTML = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    function stopwatchStop() {
+        if (stopwatchInterval) clearInterval(stopwatchInterval);
+    }
+
+    function stopwatchReset() {
+        stopwatchSeconds = 0;
+        document.getElementById('stopwatchDisplay').innerHTML = "00:00:00";
+    }
+
+    let calcBuffer = '';
+    function handleCalc(btn) {
+        let val = btn.getAttribute('data-val');
+        let op = btn.getAttribute('data-op');
+        let disp = document.getElementById('calcDisplay');
+        if (op === 'C') {
+            calcBuffer = '';
+            disp.value = '0';
+            return;
+        }
+        if (op === '=') {
+            try {
+                disp.value = eval(calcBuffer);
+                calcBuffer = disp.value;
+            } catch (e) {
+                disp.value = 'Error';
+                calcBuffer = '';
+            }
+            return;
+        }
+        if (val) calcBuffer += val;
+        else if (op) calcBuffer += op;
+        disp.value = calcBuffer;
+    }
+
+    function kmToMiles() {
+        let km = parseFloat(document.getElementById('kmInput').value) || 0;
+        document.getElementById('milesOutput').value = (km * 0.621371).toFixed(2);
+    }
+
+    function calcLoan() {
+        let P = parseFloat(document.getElementById('loanAmount').value);
+        let r = parseFloat(document.getElementById('loanRate').value) / 100 / 12;
+        let n = parseFloat(document.getElementById('loanYears').value) * 12;
+        if (P && r && n) {
+            let payment = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+            document.getElementById('loanResult').innerHTML = `Monthly: $${payment.toFixed(2)}`;
+        }
+    }
+
+    function calcFuel() {
+        let dist = parseFloat(document.getElementById('distanceKm').value);
+        let price = parseFloat(document.getElementById('fuelPrice').value);
+        let eff = parseFloat(document.getElementById('fuelEfficiency').value);
+        if (dist && price && eff) {
+            let cost = (dist / 100) * eff * price;
+            document.getElementById('fuelResult').innerHTML = `Fuel cost: $${cost.toFixed(2)}`;
+        }
+    }
+
+    function applyTheme() {
+        let theme = document.getElementById('themeSelect').value;
+        if (theme === 'Light') document.body.classList.add('light');
+        else document.body.classList.remove('light');
+    }
+
+    // Event bindings
+    function bindEvents() {
+        document.querySelectorAll('.nav button').forEach(btn => btn.addEventListener('click', () => {
+            let id = btn.dataset.section;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+            document.getElementById(id).classList.add('active-section');
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (id === 'tracker') updateTrackerFormByDate(currentSelectedDate);
+            if (id === 'notes') { renderNotes(); renderTodoList(); }
+            if (id === 'badhabits') renderBadHabitsList();
+            if (id === 'relationship') { renderLoveMessagesForDate(currentSelectedDate); monthlyLoveSummary(); }
+        }));
+
+        document.getElementById('saveTrackerBtn').addEventListener('click', saveTracker);
+        document.getElementById('addHobbyBtn').addEventListener('click', addHobby);
+        document.getElementById('addSongBtn').addEventListener('click', addSong);
+        document.getElementById('newNoteBtn').addEventListener('click', () => openNoteEditor(null));
+        document.getElementById('saveNoteBtn').addEventListener('click', saveNote);
+        document.getElementById('cancelNoteBtn').addEventListener('click', () => document.getElementById('noteEditorPanel').style.display = 'none');
+        document.querySelectorAll('.rich-cmd').forEach(cmd => cmd.addEventListener('click', () => document.execCommand(cmd.dataset.cmd, false, null)));
+        document.getElementById('addCustomExBtn').addEventListener('click', addCustomExercise);
+        document.getElementById('stopTimerBtn').addEventListener('click', stopTimer);
+        document.getElementById('addBadHabitBtn').addEventListener('click', addBadHabit);
+        document.getElementById('addLoveMsgBtn').addEventListener('click', addLoveMessage);
+        document.getElementById('monthlyLoveSummaryBtn').addEventListener('click', monthlyLoveSummary);
+        document.getElementById('addTodoBtn').addEventListener('click', addTodo);
+        document.getElementById('setPrimaryBtn').addEventListener('click', () => { primaryDate = document.getElementById('primaryRelDate').value; saveAllData(); updatePrimaryCountdown(); });
+        document.getElementById('setTogetherBtn').addEventListener('click', () => { togetherSince = document.getElementById('togetherSinceDate').value; saveAllData(); updateTogetherCounter(); });
+        document.getElementById('toggleTogetherUnitBtn').addEventListener('click', () => { togetherUnitMode = togetherUnitMode === "years" ? "days" : "years"; updateTogetherCounter(); });
+        document.getElementById('addSpecialDateBtn').addEventListener('click', () => document.getElementById('newSpecialForm').style.display = 'block');
+        document.getElementById('confirmSpecialBtn').addEventListener('click', addSpecialDate);
+        document.getElementById('cancelSpecialBtn').addEventListener('click', () => document.getElementById('newSpecialForm').style.display = 'none');
+        document.getElementById('addTransactionBtn').addEventListener('click', () => document.getElementById('transactionForm').style.display = 'block');
+        document.getElementById('saveTransBtn').addEventListener('click', addTransaction);
+        document.getElementById('cancelTransBtn').addEventListener('click', () => document.getElementById('transactionForm').style.display = 'none');
+        document.getElementById('addItemBtn').addEventListener('click', () => document.getElementById('newItemForm').style.display = 'block');
+        document.getElementById('saveItemBtn').addEventListener('click', addShoppingItem);
+        document.getElementById('addGoalBtn').addEventListener('click', () => document.getElementById('newGoalForm').style.display = 'block');
+        document.getElementById('saveGoalBtn').addEventListener('click', addGoal);
+        document.getElementById('cancelGoalBtn').addEventListener('click', () => document.getElementById('newGoalForm').style.display = 'none');
+        document.getElementById('showGoalSummaryBtn').addEventListener('click', showGoalSummary);
+        document.querySelectorAll('.life-tab-btn').forEach(btn => btn.addEventListener('click', () => {
+            let paneId = btn.dataset.pane;
+            document.querySelectorAll('.life-pane').forEach(p => p.classList.remove('active-pane'));
+            document.getElementById(paneId + 'Pane').classList.add('active-pane');
+            document.querySelectorAll('.life-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }));
+        document.getElementById('calcLoanBtn').addEventListener('click', calcLoan);
+        document.getElementById('calcFuelBtn').addEventListener('click', calcFuel);
+        document.getElementById('prevMonthBtn').addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); });
+        document.getElementById('nextMonthBtn').addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); });
+        document.querySelectorAll('.calc-btn').forEach(btn => btn.addEventListener('click', () => handleCalc(btn)));
+        document.getElementById('kmInput').addEventListener('input', kmToMiles);
+        document.getElementById('startTimerBtn').addEventListener('click', startTimer2);
+        document.getElementById('stopwatchStartBtn').addEventListener('click', stopwatchStart);
+        document.getElementById('stopwatchStopBtn').addEventListener('click', stopwatchStop);
+        document.getElementById('stopwatchResetBtn').addEventListener('click', stopwatchReset);
+        document.getElementById('applyThemeBtn').addEventListener('click', applyTheme);
+        document.getElementById('addEventBtn').addEventListener('click', () => document.getElementById('eventForm').style.display = 'block');
+        document.getElementById('saveEventBtn').addEventListener('click', addEvent);
+        document.getElementById('cancelEventBtn').addEventListener('click', () => document.getElementById('eventForm').style.display = 'none');
+        document.getElementById('addBirthdayBtn').addEventListener('click', () => document.getElementById('birthdayForm').style.display = 'block');
+        document.getElementById('saveBirthdayBtn').addEventListener('click', addBirthday);
+        document.getElementById('cancelBirthdayBtn').addEventListener('click', () => document.getElementById('birthdayForm').style.display = 'none');
+        document.getElementById('applyMoodBtn').addEventListener('click', applyMood);
+        document.getElementById('addTaskBtnProd').addEventListener('click', () => document.getElementById('newTaskFormProd').style.display = 'block');
+        document.getElementById('saveTaskBtnProd').addEventListener('click', addTaskProd);
+        document.getElementById('cancelTaskBtnProd').addEventListener('click', () => document.getElementById('newTaskFormProd').style.display = 'none');
+        document.getElementById('addChallengeBtn').addEventListener('click', addChallenge);
+        document.getElementById('addWorkoutPlanBtn').addEventListener('click', addWorkoutPlan);
+        document.getElementById('saveNutritionBtn').addEventListener('click', saveNutrition);
+        document.getElementById('startMeditationBtn').addEventListener('click', startMeditation);
+        document.getElementById('breathingExerciseBtn').addEventListener('click', breathingExercise);
+        document.getElementById('recommendMusicBtn').addEventListener('click', recommendMusic);
+        document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+        document.getElementById('addMemoryBtn').addEventListener('click', addMemory);
+        document.getElementById('addHabitBtn').addEventListener('click', addHabit);
+        document.getElementById('addExpenseBtn').addEventListener('click', addExpense);
+        document.getElementById('logReadingBtn').addEventListener('click', logReading);
+        document.getElementById('saveQuickNoteBtn').addEventListener('click', addQuickNote);
+    }
+
+    // Initialize
+    loadAllData();
+    bindEvents();
+    refreshAll();
+    initGame();
+    setInterval(() => { updatePrimaryCountdown(); updateTogetherCounter(); }, 1000);
+    setInterval(() => { document.getElementById('liveClock').innerHTML = new Date().toLocaleTimeString(); }, 1000);
+</script>
+</body>
+</html>
