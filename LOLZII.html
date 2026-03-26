@@ -1,0 +1,404 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our 1 Month Anniversary</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ffd6e7, #ffeef5, #fff7fb);
+      color: #4a2b38;
+      overflow-x: hidden;
+    }
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .heart {
+      position: absolute;
+      bottom: -50px;
+      font-size: 20px;
+      animation: floatUp linear infinite;
+      opacity: 0.7;
+    }
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+      to { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: auto;
+      padding: 24px 18px 80px;
+    }
+    .hero {
+      text-align: center;
+      padding: 32px 20px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      margin-top: 20px;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+    .special-time {
+      margin-top: 18px;
+      font-weight: bold;
+      font-size: 1.05rem;
+      color: #b33b6b;
+    }
+    .countdown {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 14px;
+    }
+    .time-box {
+      background: white;
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+    }
+    .time-box h2 { font-size: 1.9rem; color: #d14d81; }
+    .time-box span { font-size: 0.95rem; color: #6b4a58; }
+    section {
+      margin-top: 28px;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      padding: 26px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    section h2 {
+      text-align: center;
+      margin-bottom: 18px;
+      color: #b33b6b;
+      font-size: 1.9rem;
+    }
+.photo-slider {
+  position: relative;
+  max-width: 340px;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+.slides {
+  display: flex;
+  transition: transform 0.4s ease;
+  touch-action: pan-y;
+}
+
+.slides img {
+  width: 100%;
+  height: 420px;
+  flex-shrink: 0;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border: 5px solid white;
+}
+
+.slide-btn {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.8);
+  border: none;
+  font-size: 24px;
+  padding: 10px 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+    .photo-note {
+      margin-top: 14px;
+      font-size: 1rem;
+      color: #6b4a58;
+    }
+    .memories {
+      display: grid;
+      gap: 16px;
+    }
+    .memory-card {
+      background: white;
+      border-left: 6px solid #f58ab0;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    .memory-card h3 {
+      margin-bottom: 8px;
+      color: #d14d81;
+    }
+    .message-box {
+      background: linear-gradient(135deg, #fff, #ffe8f1);
+      border-radius: 24px;
+      padding: 24px;
+      line-height: 1.9;
+      font-size: 1.05rem;
+      white-space: pre-line;
+      box-shadow: inset 0 0 0 1px rgba(209,77,129,0.08);
+    }
+    .reasons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .reason {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 1rem;
+      color: #7b5a68;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 16px;
+      background: #d14d81;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(209,77,129,0.25);
+      transition: transform 0.2s ease;
+    }
+    .btn:hover { transform: scale(1.04); }
+    .secret {
+      margin-top: 16px;
+      display: none;
+      background: #fff;
+      padding: 18px;
+      border-radius: 18px;
+      line-height: 1.8;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    audio { width: 100%; margin-top: 14px; }
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      section h2 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>  <div class="container">
+    <div class="hero">
+      <h1>Happy 1 Month Anniversary ❤️</h1>
+      <p>
+        One month may sound small to the world… but to me, it holds a million feelings,
+        a thousand smiles, and some of my favorite moments with you.
+      </p>
+      <div class="special-time">Since 26 / 2 / 2026 -- 9:23 PM</div><div class="countdown">
+    <div class="time-box"><h2 id="days">0</h2><span>Days</span></div>
+    <div class="time-box"><h2 id="hours">0</h2><span>Hours</span></div>
+    <div class="time-box"><h2 id="minutes">0</h2><span>Minutes</span></div>
+    <div class="time-box"><h2 id="seconds">0</h2><span>Seconds</span></div>
+  </div>
+</div>
+
+<section>
+  <h2>Our Favorite Photo</h2>
+<div class="photo-slider">
+  <div class="slides" id="slides">
+    <img src="https://img.sanishtech.com/u/87efc83ed2689a798bd437fd60253927.jpg" alt="Our first photo" />
+    <img src="https://img.sanishtech.com/u/80ca0c26ae363bf06d201379b03b554c.jpg" alt="Our second photo" />
+  </div>
+   <div class="photo-note">
+  ...Swipe left or right to see our memories...
+  </div>
+</section>
+
+<section>
+  <h2>Our Memories</h2>
+  <div class="memories">
+    <div class="memory-card">
+      <h3>The Day You Became Mine</h3>
+      <p>26/2/2026 at exactly 9:23 PM -- the moment my heart got a date it will never forget.</p>
+    </div>
+    <div class="memory-card">
+      <h3>Our Cute Little Moments</h3>
+      <p>Every random text, every laugh, every silly joke, every small moment with you somehow became special.</p>
+    </div>
+    <div class="memory-card">
+      <h3>What I Feel With You</h3>
+      <p>You made ordinary days feel softer, happier, and way more beautiful just by being in them.</p>
+    </div>
+    <div class="memory-card">
+      <h3>To Be Continued…</h3>
+      <p>This is just month one. And honestly? I can't wait to make so many more memories with you.</p>    </div>
+        <div class="memory-card">
+      <h3>LOLZII…</h3>
+      <p> WILL YOU BE MY VALANTINE FOREVER? </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>A Message For You</h2>
+  <div class="message-box">
+
+My love,
+
+Happy one month to us.
+
+I know it's "just one month" to some people, but to me, this month has meant so much. It gave me you in a different, more beautiful way. It gave me memories I keep replaying, little moments that stayed in my heart, and feelings that became deeper every single day.
+
+Thank you for your smile, your presence, your softness, your care, and for being someone who makes my days feel better just by existing in them.
+
+You became one of my favorite parts of life so quickly, and somehow, everything feels warmer with you in it.
+
+I hope this is only the beginning of something truly beautiful between us.
+
+I love our moments. I love our bond. And most of all… I love you. </div> </section>
+
+<section>
+  <h2>Reasons Why You're So Special To Me</h2>
+  <div class="reasons">
+    <div class="reason">Your smile fixes my mood.</div>
+    <div class="reason">You make even simple moments unforgettable.</div>
+    <div class="reason">Talking to you feels like home.</div>
+    <div class="reason">You make my heart feel calm and excited at the same time.</div>
+    <div class="reason">You are genuinely precious to me.</div>
+    <div class="reason">You are my favorite notification.</div>
+  </div>
+</section>
+
+<section>
+  <h2>Secret Button</h2>
+  <div style="text-align:center;">
+    <button class="btn" onclick="showSecret()">Click Me 💌</button>
+    <div class="secret" id="secretMessage">
+      If I had to choose again, I'd still choose you.
+      <br><br>
+      Happy 1 month, baby. And this is only the beginning of us. ❤️
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Our Song</h2>
+  <p style="text-align:center; margin-bottom:12px;">Your voice is my favorite song</p>
+<audio id="bgMusic" autoplay loop>
+    <source src="https://image2url.com/r2/default/files/1774544584862-cba7191d-efc5-4973-aac5-fcd1dd7a6916.mp3" type="audio/mpeg">
+    Your browser does not support audio.
+  </audio>
+</section>
+
+<div class="footer">
+  Made with love for our first month together ❤️
+</div>
+
+  </div>  <script>
+    const startDate = new Date('2026-02-26T21:23:00');
+
+    function updateCounter() {
+      const now = new Date();
+      const diff = now - startDate;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('minutes').textContent = minutes;
+      document.getElementById('seconds').textContent = seconds;
+    }
+
+    setInterval(updateCounter, 1000);
+    updateCounter();
+
+    function showSecret() {
+      const msg = document.getElementById('secretMessage');
+      msg.style.display = msg.style.display === 'block' ? 'none' : 'block';
+    }
+
+    const heartsContainer = document.getElementById('hearts');
+    for (let i = 0; i < 25; i++) {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '❤';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (6 + Math.random() * 8) + 's';
+      heart.style.animationDelay = Math.random() * 5 + 's';
+      heart.style.fontSize = (14 + Math.random() * 22) + 'px';
+      heartsContainer.appendChild(heart);
+    }
+    const music = document.getElementById('bgMusic');
+
+window.addEventListener('load', () => {
+  music.play().catch(() => {
+    document.body.addEventListener('click', () => {
+      music.play();
+    }, { once: true });
+  });
+});
+let currentSlide = 0;
+const slides = document.getElementById('slides');
+const totalSlides = 2;
+
+function updateSlide() {
+  slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+}
+
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % totalSlides;
+  updateSlide();
+}
+
+function prevSlide() {
+  currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+  updateSlide();
+}
+
+// Touch swipe support
+let startX = 0;
+let endX = 0;
+
+slides.addEventListener('touchstart', (e) => {
+  startX = e.touches[0].clientX;
+});
+
+slides.addEventListener('touchmove', (e) => {
+  endX = e.touches[0].clientX;
+});
+
+slides.addEventListener('touchend', () => {
+  let diff = startX - endX;
+
+  if (diff > 50) {
+    nextSlide(); // swipe left
+  } else if (diff < -50) {
+    prevSlide(); // swipe right
+  }
+
+  startX = 0;
+  endX = 0;
+}); 
+  </script></body>
+</html>
